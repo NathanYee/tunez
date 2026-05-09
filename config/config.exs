@@ -74,6 +74,7 @@ config :tunez, Tunez.Mailer, adapter: Swoosh.Adapters.Local
 # Configure esbuild (the version is required)
 config :esbuild,
   version: "0.17.11",
+  path: System.get_env("ESBUILD_PATH"),
   tunez: [
     args:
       ~w(js/app.js --bundle --target=es2017 --outdir=../priv/static/assets --external:/fonts/* --external:/images/* --alias:@=.),
@@ -84,6 +85,7 @@ config :esbuild,
 # Configure tailwind (the version is required)
 config :tailwind,
   version: "4.1.4",
+  path: System.get_env("TAILWIND_PATH"),
   tunez: [
     args: ~w(
       --input=assets/css/app.css
