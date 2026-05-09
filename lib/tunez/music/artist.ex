@@ -17,5 +17,10 @@ defmodule Tunez.Music.Artist do
 
     create_timestamp :inserted_at
     update_timestamp :updated_at
+
+    actions do
+      defaults [:create, :read, :update, :destroy]
+      default_accept [:name, :biography]
+    end
   end
 end
