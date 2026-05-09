@@ -54,6 +54,16 @@
               echo "PostgreSQL started. Stop with: pg_ctl stop"
             fi
 
+            # Ensure a `postgres` superuser role exists (config/*.exs connects as it).
+            # initdb only creates a role matching $USER, so create `postgres` if missing.
+            if ! psql -h localhost -U "$USER" -d postgres -tAc \
+                 "SELECT 1 FROM pg_roles WHERE rolname='postgres'" | grep -q 1; then
+              psql -h localhost -U "$USER" -d postgres -c \
+                "CREATE ROLE postgres WITH LOGIN SUPERUSER PASSWORD 'postgres';" \
+                > /dev/null
+              echo "Created 'postgres' superuser role."
+            fi
+
             export ESBUILD_PATH="${pkgs.esbuild}/bin/esbuild"
             export TAILWIND_PATH="${pkgs.tailwindcss_4}/bin/tailwindcss"
             export PLAYWRIGHT_BROWSERS_PATH="${pkgs.playwright-driver.browsers}"
