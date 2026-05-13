@@ -25,21 +25,9 @@ defmodule TunezWeb.Artists.ShowLive do
         <.h1>
           {@artist.name}
         </.h1>
-        <:action>
-          <.button_link
-            kind="error"
-            inverse
-            data-confirm={"Are you sure you want to delete #{@artist.name}?"}
-            phx-click="destroy-artist"
-          >
-            Delete Artist
-          </.button_link>
-        </:action>
-        <:action>
-          <.button_link navigate={~p"/artists/#{@artist.id}/edit"} kind="primary" inverse>
-            Edit Artist
-          </.button_link>
-        </:action>
+        <:subtitle :if={@artist.previous_names != []}>
+          formerly known as: {Enum.join(@artist.previous_names, ", ")}
+        </:subtitle>
       </.header>
       <div class="mb-6">{formatted(@artist.biography)}</div>
 
