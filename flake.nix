@@ -27,7 +27,7 @@
             # For file watching (Phoenix live reload)
             inotify-tools
 
-            # PostgreSQL
+            # PostgreSQL client (server runs as a system service)
             postgresql
 
             # Web automation
@@ -39,38 +39,17 @@
             export HEX_HOME=$PWD/.hex
             export PATH=$MIX_HOME/bin:$HEX_HOME/bin:$PATH
 
-            # Local PostgreSQL setup (no system service required)
-            export PGDATA=$PWD/.pgdata
-            export PGHOST=$PWD/.pghost
-            mkdir -p $PGHOST
-
-            if [ ! -d "$PGDATA" ]; then
-              initdb --auth=trust --no-locale --encoding=UTF8
-            fi
-
-            if ! pg_ctl status > /dev/null 2>&1; then
-              pg_ctl start -l $PGDATA/postgresql.log \
-                -o "-k $PGHOST -h localhost"
-              echo "PostgreSQL started. Stop with: pg_ctl stop"
-            fi
-
-            # Ensure a `postgres` superuser role exists (config/*.exs connects as it).
-            # initdb only creates a role matching $USER, so create `postgres` if missing.
-            if ! psql -h localhost -U "$USER" -d postgres -tAc \
-                 "SELECT 1 FROM pg_roles WHERE rolname='postgres'" | grep -q 1; then
-              psql -h localhost -U "$USER" -d postgres -c \
-                "CREATE ROLE postgres WITH LOGIN SUPERUSER PASSWORD 'postgres';" \
-                > /dev/null
-              echo "Created 'postgres' superuser role."
-            fi
-
             export ESBUILD_PATH="${pkgs.esbuild}/bin/esbuild"
             export TAILWIND_PATH="${pkgs.tailwindcss_4}/bin/tailwindcss"
             export PLAYWRIGHT_BROWSERS_PATH="${pkgs.playwright-driver.browsers}"
 
-            mix local.hex --if-missing --force
-            mix local.rebar --if-missing --force
-	    fish
+            if ! ls "$MIX_HOME"/archives/hex-* >/dev/null 2>&1; then
+              mix local.hex --if-missing --force
+            fi
+
+            if [ ! -x "$MIX_HOME/elixir/1-19-otp-28/rebar3" ]; then
+              mix local.rebar --if-missing --force
+            fi
           '';
         };
       });

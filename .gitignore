@@ -48,3 +48,4 @@ npm-debug.log
 .pgdata/
 .hex/
 .pghost/
+.direnv/
